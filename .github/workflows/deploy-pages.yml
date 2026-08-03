@@ -24,8 +24,53 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
+      - name: Enable Pages if needed
+        id: enable
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.error, urllib.request
+
+          repo = os.environ['GITHUB_REPOSITORY']
+          url = f'https://api.github.com/repos/{repo}/pages'
+          headers = {
+              'Accept': 'application/vnd.github+json',
+              'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+              'X-GitHub-Api-Version': '2022-11-28',
+          }
+          def request(method, payload=None):
+              data = None if payload is None else json.dumps(payload).encode()
+              req = urllib.request.Request(url, data=data, headers=headers, method=method)
+              try:
+                  with urllib.request.urlopen(req) as response:
+                      return response.status, response.read().decode()
+              except urllib.error.HTTPError as error:
+                  return error.code, error.read().decode()
+
+          status, body = request('GET')
+          if status == 200:
+              detail = 'Pages already enabled'
+          elif status == 404:
+              status, body = request('POST', {'build_type': 'workflow'})
+              detail = f'Enable request returned HTTP {status}: {body[:700]}'
+              if status not in (200, 201, 204):
+                  with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+                      output.write('detail=' + detail.replace('\n', ' ') + '\n')
+                  raise SystemExit(1)
+          else:
+              detail = f'Pages lookup returned HTTP {status}: {body[:700]}'
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+                  output.write('detail=' + detail.replace('\n', ' ') + '\n')
+              raise SystemExit(1)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('detail=' + detail.replace('\n', ' ') + '\n')
+          PY
+
       - name: Configure Pages
         id: configure
+        if: steps.enable.outcome == 'success'
         continue-on-error: true
         uses: actions/configure-pages@v5
 
@@ -47,6 +92,8 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
+          ENABLE_OUTCOME: ${{ steps.enable.outcome }}
+          ENABLE_DETAIL: ${{ steps.enable.outputs.detail }}
           CONFIGURE_OUTCOME: ${{ steps.configure.outcome }}
           UPLOAD_OUTCOME: ${{ steps.upload.outcome }}
           DEPLOY_OUTCOME: ${{ steps.deployment.outcome }}
@@ -65,6 +112,8 @@ jobs:
           }
           result = {
               'commit': os.environ['GITHUB_SHA'],
+              'enable': os.environ.get('ENABLE_OUTCOME', ''),
+              'enable_detail': os.environ.get('ENABLE_DETAIL', ''),
               'configure': os.environ.get('CONFIGURE_OUTCOME', ''),
               'upload': os.environ.get('UPLOAD_OUTCOME', ''),
               'deploy': os.environ.get('DEPLOY_OUTCOME', ''),
