@@ -1,94 +1,41 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="dark">
-  <title>iPad YouTube Multistream Feasibility Test</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <main class="page-shell">
-    <header class="page-header">
-      <div>
-        <p class="eyebrow">Phase 0 technical prototype</p>
-        <h1>iPad YouTube Multistream Test</h1>
-        <p class="subtitle">Muted simultaneous-player feasibility test for 4, 8, or 12 YouTube livestreams.</p>
-      </div>
-      <div class="load-state" id="load-state">Fresh load</div>
-    </header>
-
-    <section class="control-panel" aria-label="Test controls">
-      <div class="control-group">
-        <span class="control-label">Streams</span>
-        <div class="segmented" id="count-controls" role="group" aria-label="Requested stream count">
-          <button type="button" data-count="4" class="active">4</button>
-          <button type="button" data-count="8">8</button>
-          <button type="button" data-count="12">12</button>
-        </div>
-      </div>
-
-      <div class="control-group stagger-control">
-        <label for="stagger-ms">Stagger (ms)</label>
-        <input id="stagger-ms" type="number" min="0" max="5000" step="100" inputmode="numeric">
-      </div>
-
-      <div class="button-row">
-        <button type="button" id="start-test" class="primary">Start test</button>
-        <button type="button" id="pause-all" disabled>Pause all</button>
-        <button type="button" id="resume-all" disabled>Resume all</button>
-        <button type="button" id="exit-focus" hidden>Return to grid</button>
-      </div>
-    </section>
-
-    <section class="metrics" aria-label="Test observations">
-      <div><span>Requested</span><strong id="metric-requested">4</strong></div>
-      <div><span>Initialized</span><strong id="metric-initialized">0</strong></div>
-      <div><span>Playing</span><strong id="metric-playing">0</strong></div>
-      <div><span>Failed</span><strong id="metric-failed">0</strong></div>
-      <div><span>Init duration</span><strong id="metric-duration">—</strong></div>
-      <div><span>Stagger</span><strong id="metric-stagger">650 ms</strong></div>
-    </section>
-
-    <section class="legend" aria-label="Status legend">
-      <span><i class="status-dot ok">✓</i> Playing</span>
-      <span><i class="status-dot warning">!</i> Limited / waiting</span>
-      <span><i class="status-dot error">×</i> Failed</span>
-    </section>
-
-    <section id="stream-grid" class="stream-grid" data-count="4" aria-live="polite">
-      <div class="empty-state" id="empty-state">
-        Choose a stream count, adjust the stagger if needed, then tap <strong>Start test</strong> once.
-      </div>
-    </section>
-
-    <section class="lower-panels">
-      <details open>
-        <summary>Recent status changes</summary>
-        <ol id="event-log" class="event-log"></ol>
-      </details>
-
-      <details>
-        <summary>Usage note</summary>
-        <div class="prose">
-          <p>The test URLs and default stagger are configured at the top of <code>app.js</code> in the <code>CONFIG</code> object.</p>
-          <p>Select 4, 8, or 12. Tap <strong>Start test</strong>. Changing the count after starting tears down every player and creates a clean new set.</p>
-          <p>For more than four streams, initialization is staggered by the number shown above. Change it before starting or restarting.</p>
-          <p>Green means the player reports active playback. Yellow means it is ready, buffering, paused, autoplay-blocked, or otherwise degraded. Red means the YouTube API reported a failure or unavailable video. Use <strong>Retry</strong> on an individual stream.</p>
-        </div>
-      </details>
-
-      <details>
-        <summary>Test notes template</summary>
-        <div class="notes-panel">
-          <textarea id="test-notes" aria-label="Test notes template"></textarea>
-          <button type="button" id="copy-notes">Copy notes</button>
-          <span id="copy-result" role="status"></span>
-        </div>
-      </details>
-    </section>
-  </main>
-
-  <script src="app.js"></script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>iPad YouTube Multistream Test</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark;--bg:#090d12;--p:#131a23;--p2:#1b2531;--line:#2d3947;--muted:#9ba8b7;--blue:#1677ff;--ok:#47d783;--warn:#f6bd3d;--bad:#ff6470}*{box-sizing:border-box}body{margin:0;min-width:320px;background:radial-gradient(circle at 10% 0,#163255 0,transparent 32rem),var(--bg);color:#eef4fa}button,input,textarea{font:inherit}button{min-height:42px;border:1px solid var(--line);border-radius:9px;background:#202b38;color:#fff;padding:.55rem .8rem;font-weight:750;touch-action:manipulation}button:not(:disabled){cursor:pointer}button:disabled{opacity:.45}.primary,.counts .on{background:var(--blue);border-color:#4a94ff}.shell{max-width:1600px;margin:auto;padding:max(16px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}header{display:flex;justify-content:space-between;gap:1rem;align-items:start}h1{margin:0;font-size:clamp(1.5rem,3vw,2.35rem)}header p{margin:.4rem 0 1rem;color:var(--muted)}.load{border:1px solid var(--line);border-radius:99px;padding:.45rem .7rem;color:var(--muted);white-space:nowrap}.controls,.metrics,.legend,details{border:1px solid var(--line);background:rgba(19,26,35,.94);border-radius:12px}.controls{position:sticky;z-index:10;top:max(6px,env(safe-area-inset-top));display:flex;flex-wrap:wrap;align-items:end;gap:.7rem;padding:.8rem;backdrop-filter:blur(12px)}.group{display:grid;gap:.3rem}.group label,.label{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800}.counts{display:flex;overflow:hidden;border:1px solid var(--line);border-radius:9px}.counts button{border:0;border-radius:0;min-width:55px}.counts button+button{border-left:1px solid var(--line)}input{width:105px;min-height:42px;border:1px solid var(--line);border-radius:9px;background:#0d131b;color:#fff;padding:.5rem}.actions{display:flex;flex:1 1 380px;flex-wrap:wrap;gap:.45rem}.metrics{display:grid;grid-template-columns:repeat(6,1fr);overflow:hidden;margin-top:.7rem;background:var(--line);gap:1px}.metrics div{background:var(--p);padding:.65rem}.metrics span,.metrics b{display:block}.metrics span{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metrics b{margin-top:.16rem;font-variant-numeric:tabular-nums}.legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:.65rem;padding:.55rem .7rem;color:var(--muted);font-size:.8rem}.legend span,.status{display:flex;align-items:center;gap:.35rem}.dot{display:inline-grid;place-items:center;width:1.2rem;height:1.2rem;border-radius:50%;color:#08110c;font-style:normal;font-weight:950}.ok{background:var(--ok)}.warn{background:var(--warn)}.bad{background:var(--bad)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:.75rem;align-items:start}.grid.c8,.grid.c12{grid-template-columns:repeat(4,minmax(0,1fr))}.empty{grid-column:1/-1;min-height:250px;display:grid;place-items:center;border:1px dashed #3d4c5d;border-radius:12px;color:var(--muted);text-align:center;padding:2rem}.card{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:11px;background:var(--p)}.card[data-s=play]{border-color:#47d783aa}.card[data-s=fail]{border-color:#ff6470bb}.head{min-height:43px;display:flex;align-items:center;justify-content:space-between;gap:.45rem;padding:.45rem .55rem}.head h2{margin:0;font-size:.85rem;white-space:nowrap}.status{min-width:0;justify-content:end;color:var(--muted);font-size:.68rem}.status span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.frame{aspect-ratio:16/9;background:#000}.frame>div,.frame iframe{display:block;width:100%;height:100%;border:0}.card .buttons{display:flex;gap:.4rem;padding:.45rem}.card .buttons button{min-height:34px;flex:1;padding:.35rem;font-size:.75rem}.grid.focus{grid-template-columns:repeat(6,minmax(105px,1fr))}.grid.focus .card.focused{grid-column:1/-1;grid-row:1}.grid.focus .card:not(.focused) .buttons,.grid.focus .card:not(.focused) .status span{display:none}.grid.focus .card:not(.focused) .head{min-height:35px}.panels{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-top:.8rem}details{overflow:hidden}summary{padding:.72rem .8rem;font-weight:800;cursor:pointer}details[open] summary{border-bottom:1px solid var(--line)}.body{padding:.7rem .8rem;color:#cad5df;font-size:.8rem;line-height:1.5}.log{max-height:260px;overflow:auto;margin:0;padding:.4rem .7rem .7rem;list-style:none}.log li{display:grid;grid-template-columns:5rem 1fr;gap:.4rem;padding:.4rem 0;border-bottom:1px solid #2d394799;font-size:.72rem}.log time{color:var(--muted)}textarea{width:100%;min-height:245px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:#0d131b;color:#fff;padding:.65rem;font-family:ui-monospace,monospace;font-size:.7rem}.copy{display:grid;gap:.5rem}.copied{color:var(--ok)}code{background:#0d131b;border:1px solid var(--line);border-radius:4px;padding:.08rem .25rem}@media(max-width:1050px){.metrics{grid-template-columns:repeat(3,1fr)}.panels{grid-template-columns:1fr}}@media(max-width:820px){header{display:block}.load{display:inline-block;margin-bottom:.7rem}.grid.c8,.grid.c12{grid-template-columns:repeat(2,1fr)}.grid.focus{grid-template-columns:repeat(3,1fr)}}@media(max-width:560px){.controls{position:static}.metrics{grid-template-columns:repeat(2,1fr)}.grid,.grid.c8,.grid.c12{grid-template-columns:1fr}.grid.focus{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><main class="shell">
+<header><div><h1>iPad YouTube Multistream Test</h1><p>Disposable Phase 0 test for 4, 8, or 12 simultaneous muted livestream players.</p></div><div class="load" id="load">Fresh load</div></header>
+<section class="controls"><div class="group"><span class="label">Streams</span><div class="counts" id="counts"><button data-n="4" class="on">4</button><button data-n="8">8</button><button data-n="12">12</button></div></div><div class="group"><label for="stagger">Stagger (ms)</label><input id="stagger" type="number" min="0" max="5000" step="100" value="650"></div><div class="actions"><button id="start" class="primary">Start test</button><button id="pause" disabled>Pause all</button><button id="resume" disabled>Resume all</button><button id="unfocus" hidden>Return to grid</button></div></section>
+<section class="metrics"><div><span>Requested</span><b id="mReq">4</b></div><div><span>Initialized</span><b id="mInit">0</b></div><div><span>Playing</span><b id="mPlay">0</b></div><div><span>Failed</span><b id="mFail">0</b></div><div><span>Init duration</span><b id="mTime">—</b></div><div><span>Stagger</span><b id="mStag">650 ms</b></div></section>
+<section class="legend"><span><i class="dot ok">✓</i>Playing</span><span><i class="dot warn">!</i>Limited / waiting</span><span><i class="dot bad">×</i>Failed</span></section>
+<section id="grid" class="grid c4"><div class="empty">Choose 4, 8, or 12, adjust the stagger if needed, then tap <b>Start test</b>.</div></section>
+<section class="panels"><details open><summary>Recent status changes</summary><ol class="log" id="log"></ol></details><details><summary>Usage note</summary><div class="body"><p>URLs and defaults are in the <code>CONFIG</code> object near the top of this file.</p><p>Select 4, 8, or 12 and tap <b>Start test</b>. Changing the count after startup destroys every player and creates a clean set.</p><p>More than four players use the displayed stagger. Green is active playback; yellow is ready, buffering, paused, blocked, or otherwise degraded; red is a YouTube/API failure. Each card has Retry.</p></div></details><details><summary>Test notes template</summary><div class="body copy"><textarea id="notes"></textarea><button id="copy">Copy notes</button><span id="copied" class="copied"></span></div></details></section>
+</main><script>
+'use strict';
+// ===== EDITABLE TEST CONFIGURATION =====
+const CONFIG={urls:[
+'https://www.youtube.com/watch?v=h8O0UXsL7uk','https://www.youtube.com/watch?v=E_4y8jgvSRA','https://www.youtube.com/watch?v=vK3RouzZoT4','https://www.youtube.com/watch?v=GQYME0i_idI','https://www.youtube.com/watch?v=FVdmnpJ2kM0','https://www.youtube.com/watch?v=iws3rh5vLAQ','https://www.youtube.com/watch?v=EGk3Mr0OshE','https://www.youtube.com/watch?v=iWCeBAxRCBo','https://www.youtube.com/watch?v=GQYME0i_idI','https://www.youtube.com/watch?v=h8O0UXsL7uk','https://www.youtube.com/watch?v=UpwNqncnqTE','https://www.youtube.com/watch?v=UDAZWxehMAI'],defaultCount:4,defaultStagger:650,readyTimeout:15000,maxLog:30};
+// ===== END EDITABLE TEST CONFIGURATION =====
+const $=id=>document.getElementById(id),D={};
+const S={n:CONFIG.defaultCount,run:false,gen:0,players:new Map,records:new Map,startAt:0,endAt:0,api:null};
+const ERR={2:'Invalid video ID or parameter',5:'HTML5 playback error',100:'Video unavailable or removed',101:'Embedding disabled by owner',150:'Embedding disabled by owner'};
+function idFrom(url){try{let u=new URL(url);return u.hostname==='youtu.be'?u.pathname.slice(1):u.searchParams.get('v')||u.pathname.split('/').filter(Boolean).pop()}catch{return null}}
+function api(){if(S.api)return S.api;S.api=new Promise((ok,no)=>{if(window.YT?.Player)return ok(YT);window.onYouTubeIframeAPIReady=()=>ok(YT);let s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>no(Error('API load failed'));document.head.append(s)});return S.api}
+function clock(){return new Intl.DateTimeFormat([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date)}
+function log(text,kind=''){let li=document.createElement('li');li.className=kind;li.innerHTML=`<time>${clock()}</time><span></span>`;li.lastChild.textContent=text;D.log.prepend(li);while(D.log.children.length>CONFIG.maxLog)D.log.lastChild.remove()}
+function stag(){let n=parseInt(D.stagger.value,10);return Number.isFinite(n)?Math.min(5000,Math.max(0,n)):CONFIG.defaultStagger}
+function metrics(){let r=[...S.records.values()],init=r.filter(x=>x.init).length,play=r.filter(x=>x.s==='play').length,fail=r.filter(x=>x.s==='fail').length;D.mReq.textContent=S.n;D.mInit.textContent=init;D.mPlay.textContent=play;D.mFail.textContent=fail;D.mStag.textContent=stag()+' ms';D.mTime.textContent=S.startAt?(((S.endAt||performance.now())-S.startAt)/1000).toFixed(1)+' s':'—';D.pause.disabled=D.resume.disabled=!S.players.size}
+function mark(i,s,why,write=true){let r=S.records.get(i);if(!r)return;let changed=r.s!==s||r.why!==why;r.s=s;r.why=why;r.card.dataset.s=s;let p=s==='play'?['✓','ok','Playing']:s==='fail'?['×','bad','Failed']:['!','warn','Waiting'];r.icon.textContent=p[0];r.icon.className='dot '+p[1];r.text.textContent=p[2]+(why?': '+why:'');if(changed&&write)log(`Stream ${i+1}: ${why||p[2]}`,p[1]);metrics()}
+function card(i){let c=document.createElement('article');c.className='card';c.dataset.s='wait';c.innerHTML=`<div class="head"><h2>Stream ${i+1}</h2><div class="status"><i class="dot warn">!</i><span>Waiting: queued</span></div></div><div class="frame"><div id="p-${S.gen}-${i}"></div></div><div class="buttons"><button class="focus">Focus</button><button class="retry">Retry</button></div>`;D.grid.append(c);let r={i,url:CONFIG.urls[i],vid:idFrom(CONFIG.urls[i]),card:c,mount:c.querySelector('.frame>div'),icon:c.querySelector('i'),text:c.querySelector('.status span'),s:'wait',why:'queued',init:false,timer:0};c.querySelector('.focus').onclick=()=>focus(i);c.querySelector('.retry').onclick=()=>retry(i);S.records.set(i,r);return r}
+function destroy(i){let r=S.records.get(i);if(r?.timer)clearTimeout(r.timer);let p=S.players.get(i);try{p?.destroy()}catch{}S.players.delete(i)}
+function clearAll(keepLog=true){S.gen++;[...S.players.keys()].forEach(destroy);S.records.forEach(r=>r.timer&&clearTimeout(r.timer));S.players.clear();S.records.clear();S.startAt=S.endAt=0;D.grid.replaceChildren();D.grid.className=`grid c${S.n}`;D.unfocus.hidden=true;if(!keepLog)D.log.replaceChildren();metrics()}
+function makePlayer(i,g){if(g!==S.gen)return;let r=S.records.get(i);if(!r?.vid)return mark(i,'fail','Invalid YouTube URL');mark(i,'wait','initializing');r.timer=setTimeout(()=>{if(g===S.gen&&!r.init)mark(i,'fail','Player ready timeout')},CONFIG.readyTimeout);try{let p=new YT.Player(r.mount.id,{videoId:r.vid,width:'100%',height:'100%',playerVars:{autoplay:0,controls:1,disablekb:1,fs:0,playsinline:1,rel:0,origin:location.origin},events:{onReady:e=>{if(g!==S.gen)return e.target.destroy();clearTimeout(r.timer);r.init=true;S.players.set(i,e.target);try{e.target.mute();e.target.playVideo();mark(i,'wait','ready; starting muted playback')}catch{mark(i,'fail','Playback command failed')}},onStateChange:e=>{if(g!==S.gen)return;let x=e.data;x===1?mark(i,'play','muted playback active'):x===3?mark(i,'wait','buffering'):x===2?mark(i,'wait','paused'):x===0?mark(i,'wait','stream ended'):x===5?mark(i,'wait','cued; playback inactive'):mark(i,'wait','unstarted')},onError:e=>mark(i,'fail',(ERR[e.data]||'YouTube error')+` (${e.data})`)}});S.players.set(i,p)}catch{mark(i,'fail','Player creation failed')}}
+const sleep=ms=>new Promise(ok=>setTimeout(ok,ms));
+async function start(reason='Started test'){let n=S.n,g=S.gen+1;clearAll(true);S.gen=g;S.run=true;S.startAt=performance.now();D.start.disabled=true;D.start.textContent='Starting…';log(`${reason}: ${n} streams requested`);for(let i=0;i<n;i++)card(i);metrics();try{await api()}catch{if(g===S.gen)for(let i=0;i<n;i++)mark(i,'fail','YouTube API unavailable');return}finally{if(g===S.gen){D.start.disabled=false;D.start.textContent='Restart test'}}let delay=n>4?stag():0;for(let i=0;i<n;i++){if(g!==S.gen)return;makePlayer(i,g);if(delay&&i<n-1)await sleep(delay)}if(g===S.gen){S.endAt=performance.now();metrics();log(`Initialization commands completed in ${((S.endAt-S.startAt)/1000).toFixed(1)} seconds`)}}
+function choose(n){S.n=n;D.grid.className=`grid c${n}`;D.counts.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.n===n));metrics();if(S.run)start('Changed stream count')}
+function retry(i){let r=S.records.get(i);if(!r)return;destroy(i);let old=r.card.querySelector('.frame>*'),m=document.createElement('div');m.id=`p-${S.gen}-${i}-r-${Date.now()}`;old.replaceWith(m);r.mount=m;r.init=false;mark(i,'wait','retrying');makePlayer(i,S.gen)}
+function focus(i){D.grid.classList.add('focus');D.unfocus.hidden=false;S.records.forEach(r=>r.card.classList.toggle('focused',r.i===i));S.records.get(i).card.scrollIntoView({behavior:'smooth',block:'start'});log(`Focused stream ${i+1}`)}
+function unfocus(){D.grid.classList.remove('focus');D.unfocus.hidden=true;S.records.forEach(r=>r.card.classList.remove('focused'));log('Returned to full grid')}
+function command(name){S.players.forEach((p,i)=>{try{name==='pause'?p.pauseVideo():(p.mute(),p.playVideo())}catch{mark(i,'wait',name+' command unavailable')}});log(name==='pause'?'Pause-all command sent':'Muted resume-all command sent')}
+function notes(){return `iPad YouTube Multistream Feasibility Test Notes\n\nDate/time:\nDevice: iPad Air M1 / previous 10.9-inch iPad Air / other:\niPadOS version:\nNetwork quality:\nOrientation: Landscape\n\n4 streams — startup, init time, failures, stability:\n\n8 streams — startup, init time, failures, stability:\n\n12 streams — startup, init time, failures, stability:\n\nSwitch 4 → 8 → 12 → 4:\nFocus and return:\nPause/resume all:\nSwitch apps and return:\nReload/discard recovery:\nSustained playback duration:\nThermal behavior or dimming:\nRepeated errors:\nSevere usability problems:\n\nASSESSMENT\n[ ] Viable\n[ ] Viable with constraints\n[ ] Not viable in the tested form\n\nConstraints / reliable count:\n`}
+function init(){['load','counts','stagger','start','pause','resume','unfocus','grid','log','mReq','mInit','mPlay','mFail','mTime','mStag','notes','copy','copied'].forEach(x=>D[x]=$(x));let nav=performance.getEntriesByType('navigation')[0];D.load.textContent=nav?.type==='reload'?'Reloaded page':nav?.type==='back_forward'?'Restored from history':'Fresh load';addEventListener('pageshow',e=>{if(e.persisted){D.load.textContent='Restored from memory';log('Page restored from WebKit memory','warn')}});document.addEventListener('visibilitychange',()=>log(document.hidden?'Page moved to background':'Page returned to foreground'));D.counts.onclick=e=>{let b=e.target.closest('[data-n]');if(b)choose(+b.dataset.n)};D.stagger.onchange=()=>{D.stagger.value=stag();metrics()};D.start.onclick=()=>start(S.run?'Restarted test':'Started test');D.pause.onclick=()=>command('pause');D.resume.onclick=()=>command('resume');D.unfocus.onclick=unfocus;D.notes.value=notes();D.copy.onclick=async()=>{try{await navigator.clipboard.writeText(D.notes.value)}catch{D.notes.select();document.execCommand('copy')}D.copied.textContent='Copied.';setTimeout(()=>D.copied.textContent='',1500)};choose(CONFIG.defaultCount);log('Ready; no players active until Start test is tapped');api().catch(()=>log('YouTube API preload failed','bad'))}
+document.addEventListener('DOMContentLoaded',init);
+</script></body></html>
