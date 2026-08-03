@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <title>iPad YouTube Multistream Feasibility Test</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Phase 0 technical prototype</p>
+        <h1>iPad YouTube Multistream Test</h1>
+        <p class="subtitle">Muted simultaneous-player feasibility test for 4, 8, or 12 YouTube livestreams.</p>
+      </div>
+      <div class="load-state" id="load-state">Fresh load</div>
+    </header>
+
+    <section class="control-panel" aria-label="Test controls">
+      <div class="control-group">
+        <span class="control-label">Streams</span>
+        <div class="segmented" id="count-controls" role="group" aria-label="Requested stream count">
+          <button type="button" data-count="4" class="active">4</button>
+          <button type="button" data-count="8">8</button>
+          <button type="button" data-count="12">12</button>
+        </div>
+      </div>
+
+      <div class="control-group stagger-control">
+        <label for="stagger-ms">Stagger (ms)</label>
+        <input id="stagger-ms" type="number" min="0" max="5000" step="100" inputmode="numeric">
+      </div>
+
+      <div class="button-row">
+        <button type="button" id="start-test" class="primary">Start test</button>
+        <button type="button" id="pause-all" disabled>Pause all</button>
+        <button type="button" id="resume-all" disabled>Resume all</button>
+        <button type="button" id="exit-focus" hidden>Return to grid</button>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="Test observations">
+      <div><span>Requested</span><strong id="metric-requested">4</strong></div>
+      <div><span>Initialized</span><strong id="metric-initialized">0</strong></div>
+      <div><span>Playing</span><strong id="metric-playing">0</strong></div>
+      <div><span>Failed</span><strong id="metric-failed">0</strong></div>
+      <div><span>Init duration</span><strong id="metric-duration">—</strong></div>
+      <div><span>Stagger</span><strong id="metric-stagger">650 ms</strong></div>
+    </section>
+
+    <section class="legend" aria-label="Status legend">
+      <span><i class="status-dot ok">✓</i> Playing</span>
+      <span><i class="status-dot warning">!</i> Limited / waiting</span>
+      <span><i class="status-dot error">×</i> Failed</span>
+    </section>
+
+    <section id="stream-grid" class="stream-grid" data-count="4" aria-live="polite">
+      <div class="empty-state" id="empty-state">
+        Choose a stream count, adjust the stagger if needed, then tap <strong>Start test</strong> once.
+      </div>
+    </section>
+
+    <section class="lower-panels">
+      <details open>
+        <summary>Recent status changes</summary>
+        <ol id="event-log" class="event-log"></ol>
+      </details>
+
+      <details>
+        <summary>Usage note</summary>
+        <div class="prose">
+          <p>The test URLs and default stagger are configured at the top of <code>app.js</code> in the <code>CONFIG</code> object.</p>
+          <p>Select 4, 8, or 12. Tap <strong>Start test</strong>. Changing the count after starting tears down every player and creates a clean new set.</p>
+          <p>For more than four streams, initialization is staggered by the number shown above. Change it before starting or restarting.</p>
+          <p>Green means the player reports active playback. Yellow means it is ready, buffering, paused, autoplay-blocked, or otherwise degraded. Red means the YouTube API reported a failure or unavailable video. Use <strong>Retry</strong> on an individual stream.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Test notes template</summary>
+        <div class="notes-panel">
+          <textarea id="test-notes" aria-label="Test notes template"></textarea>
+          <button type="button" id="copy-notes">Copy notes</button>
+          <span id="copy-result" role="status"></span>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
