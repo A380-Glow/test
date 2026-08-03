@@ -1,9 +1,7 @@
 {
-  "commit": "3021f16c8bf5d71ca48baaceb1ff2ab0daa2e389",
-  "enable": "failure",
-  "enable_detail": "Enable request returned HTTP 403: {\"message\":\"Resource not accessible by integration\",\"documentation_url\":\"https://docs.github.com/rest/pages/pages#create-a-apiname-pages-site\",\"status\":\"403\"}",
-  "configure": "skipped",
-  "upload": "skipped",
-  "deploy": "skipped",
-  "page_url": ""
+  "commit": "a1743e6ba603bcc0dfee059730750fd6ffbb398b",
+  "configure": "success",
+  "upload": "success",
+  "deploy": "success",
+  "page_url": "https://a380-glow.github.io/test/"
 }
